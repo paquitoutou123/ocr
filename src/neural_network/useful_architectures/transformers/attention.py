@@ -3,12 +3,14 @@ import torch.nn
 import numpy
 
 
-class attention():
+class Attention():
 
 
     def scaled_dot_product_attention(Q, K, V):
         """
-        
+        Q: the Query
+        K: the key
+        V: the value
         """
         
         transposed = numpy.matrix.transpose(K)
