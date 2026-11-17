@@ -4,29 +4,25 @@ import numpy
 
 
 
-class ScaledDotProductAttention():
 
-    def __init__(self, Q, K, V):
+
+
+def ScaledDotProductAttention(Q, K, V):
         """
-        Q: the Query
-        K: the key
-        V: the value
+        inputs:
+            Q : the query matrix
+            K: the key matrix
+            V: the value matrix
         """
-        self.Q = Q
-        self.K = K
-        self.V = V
 
+        transposed =torch.transpose(K, 0, 1)
+        matmul = Q @ transposed
 
+        d = (K.shape)[1]
+        d = torch.tensor(d)
+        div = matmul/(torch.sqrt(d))
 
-    def forward(self):
-
-        transposed = numpy.matrix.transpose(self.K)
-        matmul = numpy.matmul(self.Q, transposed)
-
-        d = (numpy.shape())[1]
-        div = matmul/(numpy.sqrt(d))
-
-        return (torch.nn.Softmax(div)*(self.V))
+        return ((torch.softmax(div, dim=1))@V)
 
 
 
@@ -34,34 +30,48 @@ class ScaledDotProductAttention():
 
 
 
-class MultiHeadAttention():
+class MultiHeadAttention(torch.nn.Module):
 
-    def __init__(self, total_dim, total_Q, total_V, total_K, head_num):
+    def __init__(self, total_dim, head_num):
         """
         
         """        
         self.total_dim = total_dim
-        self.total_Q = total_Q
-        self.total_V = total_V
-        self.total_K = total_K
         self.head_num = head_num
 
 
-    def project_into_heads(self):
+    def project_into_heads(self, Q, K, V):
+        """
+        inputs:
+            Q : the query matrix
+            V : the value matrix
+            K : the key matrix
 
-        W_heads = torch.chunk(self.Q.weight, self.head_num, dim=1)
-        Q_heads = torch.chunk(self.V.weight, self.head_num, dim=1)
-        K_heads = torch.chunk(self.K.weight, self.head_num, dim=1)
+        outputs:
+            a tuple of lists of the projections of the Q V K matrices 
+        """
 
-        return (W_heads, Q_heads, K_heads)
+        Q_heads = torch.chunk(Q, self.head_num, dim=1)
+        V_heads = torch.chunk(V, self.head_num, dim=1)
+        K_heads = torch.chunk(K, self.head_num, dim=1)
+
+        return (Q_heads, K_heads, V_heads)
         
 
-    def forward(self):
+    def forward(self, Q, K, V):
+        """
+        inputs:
+            Q : the query matrix
+            V : the value matrix
+            K : the key matrix
+        """
         
+        split_inputs = self.project_into_heads(Q, K, V)
+
         heads_list = []
+
         for k in range(self.head_num):
-            single_head_attention = ScaledDotProductAttention(self.project_into_heads()[0], self.project_into_heads()[1], self.project_into_heads()[2])
-            result = single_head_attention.forward()
+            result = ScaledDotProductAttention(split_inputs[0][k], split_inputs[1][k], split_inputs[2][k])
             heads_list.append(result)
 
         final_result =  torch.cat(heads_list, dim=1)

@@ -4,7 +4,7 @@ import torchvision
 
 from neural_network.layout_analysis.backbone import Backbone
 
-class Layout_analysis():
+class Layout_analysis(torch.nn.Module):
     """
     the selected architecture is RT-DETR
 
