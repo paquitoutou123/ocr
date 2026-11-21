@@ -51,7 +51,7 @@ def aifi_forward_test():
     try:
         aifi = Aifi()
         # entrée : batch=2, channels=512, hauteur=8, largeur=8
-        x = torch.randn(2, 512, 8, 8)
+        x = torch.randn(2, 2048, 20, 20)
         out = aifi.forward(x)
         print(f"Aifi forward OK, shape de sortie : {tuple(out.shape)}")
         return True
@@ -118,5 +118,5 @@ def run_all_tests():
 
 if __name__ == "__main__":
     #run_all_tests()
-    aifi_instantiation_test()
+    #aifi_instantiation_test()
     aifi_forward_test()

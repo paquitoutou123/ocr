@@ -55,12 +55,7 @@ def test_pytorch_equivalence():
     # pytorch's implementation
     ref = torch.nn.MultiheadAttention(512, 8, batch_first=True)
 
-#    # weight copy
-#    with torch.no_grad():
-#       ref.in_proj_weight.copy_(
-#            torch.cat([mine.W_q.weight, mine.W_k.weight, mine.W_v.weight], dim=0)
-#        )
-#       ref.out_proj.weight.copy_(mine.W_o.weight)
+    
 
     
     ref.eval()
